@@ -6,10 +6,10 @@
     {
       "id": "US-000",
       "title": "Health endpoint says hello",
-      "description": "GET /api/health returns status 200 and the JSON {ok:true}",
+      "description": "GET /api/health returns status 200 and the JSON {\"status\":\"ok\"}",
       "acceptanceCriteria": [
         "GET /api/health returns 200",
-        "response body is {ok:true}"
+        "the response body is {\"status\":\"ok\"}"
       ],
       "priority": 1,
       "passes": false,
