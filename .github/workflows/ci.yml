@@ -1,0 +1,52 @@
+name: ci
+on: [pull_request]
+permissions: { contents: read, pull-requests: write, id-token: write }
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run verify
+      - name: protected tests must not be changed or deleted
+        run: |
+          if git diff --name-only --diff-filter=MD origin/${{ github.base_ref }}...HEAD | grep -Eq '^tests/(acceptance|invariants|load|smoke)/'; then
+            echo "a protected test was modified or deleted"; exit 1
+          fi
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: gitleaks/gitleaks-action@v3
+        env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+      - uses: returntocorp/semgrep-action@v1
+        with: { config: auto }
+  reviewer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_args: --max-turns 40 --allowedTools "Read,Grep,Glob,Write,Bash(git diff *),Bash(git log *)"
+          prompt: |
+            You are an independent reviewer who never saw the build conversation.
+            Review the diff of this pull request against docs/SPEC.md, CLAUDE.md and docs/DESIGN.md.
+            Check: every acceptance criterion of the story is covered by a test; no architecture rule is broken;
+            no invariant in the spec is left untested; no secret, no disabled test, no placeholder code;
+            screenshots in docs/evidence/ match the spec. Look at the screenshots.
+            Write REPORT.md for a person who cannot read code: what changed, how it was tested (with numbers),
+            what could go wrong, what to click on the preview. Under 300 words. No code.
+            Then write review-verdict.json as {"verdict":"APPROVE"} or {"verdict":"BLOCK","reasons":[...]}.
+            Block whenever you are unsure.
+      - name: post the plain-English report on the PR
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        run: gh pr comment ${{ github.event.pull_request.number }} --body-file REPORT.md
+      - name: fail unless the verdict is APPROVE
+        run: jq -e '.verdict == "APPROVE"' review-verdict.json

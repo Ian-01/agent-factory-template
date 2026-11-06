@@ -1,0 +1,27 @@
+name: release
+on:
+  schedule: [{ cron: '0 9 * * 5' }]
+  workflow_dispatch:
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm ci
+      - name: build a production deployment that is not live yet
+        id: stage
+        run: echo "url=$(npx vercel deploy --prod --skip-domain --yes --token=$VERCEL_TOKEN)" >> "$GITHUB_OUTPUT"
+      - run: npx playwright install --with-deps chromium
+      - name: smoke test against the staged build
+        run: BASE_URL=${{ steps.stage.outputs.url }} npm run smoke
+      - uses: grafana/setup-k6-action@v1
+      - name: load test, 200 requests per second for 2 minutes
+        run: k6 run -e BASE_URL=${{ steps.stage.outputs.url }} tests/load/smoke.js
+      - name: promote to production
+        run: npx vercel promote ${{ steps.stage.outputs.url }} --yes --token=$VERCEL_TOKEN

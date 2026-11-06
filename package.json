@@ -1,0 +1,34 @@
+{
+  "name": "agent-factory-template",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "jest",
+    "verify": "npx biome ci . && npx tsc --noEmit && npm test -- --coverage && npx playwright test tests/acceptance tests/invariants",
+    "smoke": "npx playwright test tests/smoke"
+  },
+  "dependencies": {
+    "next": "^16.4.5",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.5",
+    "@playwright/test": "^1.65.0",
+    "@tailwindcss/postcss": "^4.3.4",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "jest": "^30.5.2",
+    "prettier": "^3.9.10",
+    "tailwindcss": "^4.3.4",
+    "typescript": "^7.0.2"
+  }
+}
