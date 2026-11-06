@@ -1,0 +1,19 @@
+{
+  "project": "agent-factory-template",
+  "branchName": "claude/rehearsal",
+  "description": "Rehearsal story to exercise the night loop end to end.",
+  "userStories": [
+    {
+      "id": "US-000",
+      "title": "Health endpoint says hello",
+      "description": "GET /api/health returns status 200 and the JSON {ok:true}",
+      "acceptanceCriteria": [
+        "GET /api/health returns 200",
+        "response body is {ok:true}"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}
