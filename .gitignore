@@ -11,3 +11,8 @@ logs/
 !.env.example
 *.log
 .DS_Store
+BLOCKED.md
+*.tsbuildinfo
+.claude/scheduled_tasks.json
+.claude/settings.local.json
+.claude/worktrees/
