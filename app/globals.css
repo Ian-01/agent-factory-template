@@ -1,2 +1,4 @@
-@import "tailwindcss";
-@source not "../.claude";
+@import "tailwindcss" source(none);
+@source "../app";
+@source "../components";
+@source "../lib";
