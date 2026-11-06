@@ -3,6 +3,7 @@ name: next-product
 description: Take the next ready brief from backlog/, write its spec and stories, and mark it done when everything has shipped.
 disable-model-invocation: true
 ---
+
 1. Read backlog/. Take the lowest-numbered file whose Status is ready; set it to in-progress.
 2. Write docs/SPEC.md from the brief, keeping every heading, including Invariants and Scale target.
 3. Run /prd then /ralph to produce prd.json with 6-10 stories the size of "add a filter dropdown".

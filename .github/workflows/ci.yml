@@ -4,10 +4,14 @@ permissions: { contents: read, pull-requests: write, id-token: write }
 jobs:
   verify:
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: { fetch-depth: 0 }
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with: { node-version: 22 }
       - run: npm ci
       - run: npx playwright install --with-deps chromium
@@ -20,27 +24,30 @@ jobs:
   security:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: { fetch-depth: 0 }
       - uses: gitleaks/gitleaks-action@v3
         env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
-      - uses: returntocorp/semgrep-action@v1
-        with: { config: auto }
+      - run: pipx install semgrep && semgrep scan --config auto --error
   reviewer:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: { fetch-depth: 0 }
       - uses: anthropics/claude-code-action@v1
         with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }} # subscription login; on an API key use: anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_args: --max-turns 40 --allowedTools "Read,Grep,Glob,Write,Bash(git diff *),Bash(git log *)"
           prompt: |
-            You are an independent reviewer who never saw the build conversation.
-            Review the diff of this pull request against docs/SPEC.md, CLAUDE.md and docs/DESIGN.md.
-            Check: every acceptance criterion of the story is covered by a test; no architecture rule is broken;
-            no invariant in the spec is left untested; no secret, no disabled test, no placeholder code;
-            screenshots in docs/evidence/ match the spec. Look at the screenshots.
+            You are an independent reviewer who never saw the build conversation. Review this pull request's diff
+            (git diff origin/main...HEAD) and decide which kind of PR it is.
+            (a) A planning PR changes only prd.json, progress.txt, backlog/, docs/ or files under tests/. Approve it when
+            it adds or edits stories, specs or tests consistently with docs/SPEC.md and contains no application code,
+            no secret, and no weakened or deleted test. Do not require screenshots or an implementation for a planning PR.
+            (b) A story PR changes application code and sets a story's "passes" to true in prd.json. Check it against
+            docs/SPEC.md, CLAUDE.md and docs/DESIGN.md (if it exists): every acceptance criterion of that story is covered
+            by a test; no architecture rule is broken; no invariant in the spec is left untested; no secret, no disabled
+            test, no placeholder code; screenshots in docs/evidence/<story-id>/ exist and match the spec. Look at them.
             Write REPORT.md for a person who cannot read code: what changed, how it was tested (with numbers),
             what could go wrong, what to click on the preview. Under 300 words. No code.
             Then write review-verdict.json as {"verdict":"APPROVE"} or {"verdict":"BLOCK","reasons":[...]}.

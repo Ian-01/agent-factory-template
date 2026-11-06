@@ -5,10 +5,9 @@ coverage/
 test-results/
 playwright-report/
 logs/
-next-env.d.ts
-*.tsbuildinfo
+.vercel
 .env
 .env.*
 !.env.example
-.vercel
-.env*
+*.log
+.DS_Store
