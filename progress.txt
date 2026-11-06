@@ -1,0 +1,8 @@
+US-000: Health endpoint says hello
+
+The app already had a working /api/health endpoint that returns status 200
+with the body {"status":"ok"}, plus tests confirming this. All checks
+(code style, type checking, unit tests, and browser tests) pass.
+
+I added one new browser test that visits the health endpoint and the home
+page and saves screenshots as proof, then marked this story as done.
