@@ -13,4 +13,7 @@ WRITERS='(^|[^A-Za-z0-9_-])(>|>>|tee|rm|mv|cp|sed -i|perl -i|touch|mkdir|chmod|t
 if [ -n "$CMD" ] && is_protected "$CMD" && echo "$CMD" | grep -Eq "$WRITERS"; then
   echo "Blocked: that command would change a protected path. Fix the source, not the judge." >&2; exit 2
 fi
+if [ -n "$CMD" ] && echo "$CMD" | grep -Eq 'git add[^|;&]*( -f| --force)'; then
+  echo "Blocked: git add -f would commit a git-ignored file (BLOCKED.md, keys, logs). Ignored files stay out of git." >&2; exit 2
+fi
 exit 0

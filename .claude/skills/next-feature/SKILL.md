@@ -24,3 +24,5 @@ You are one session in an overnight loop and remember nothing from earlier sessi
    English lines to progress.txt, commit `feat: <story-id> <title>`, then
    `git push -u origin HEAD`, `gh pr create --fill` and `gh pr merge --auto --squash`.
    The PR merges by itself when every check is green; a human never reads the diff.
+
+9. BLOCKED.md is git-ignored on purpose: never git add -f it and never commit it.

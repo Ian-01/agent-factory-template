@@ -29,3 +29,4 @@ Follow docs/DESIGN.md. Reference screenshots are in docs/design/.
 
 ## Spec
 @docs/SPEC.md
+- BLOCKED.md is git-ignored on purpose: never git add -f it, never commit it.

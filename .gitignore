@@ -16,3 +16,22 @@ BLOCKED.md
 .claude/scheduled_tasks.json
 .claude/settings.local.json
 .claude/worktrees/
+# empty placeholder files the Claude Code sandbox creates (known bug); never commit them
+.bash_profile
+.bashrc
+.profile
+.zprofile
+.zshrc
+.gitconfig
+.gitmodules
+.mcp.json
+.ripgreprc
+.idea
+.vscode
+.claude/agents
+.claude/commands
+.claude/launch.json
+.claude/loop.md
+.claude/output-styles
+.claude/routines
+.claude/workflows
